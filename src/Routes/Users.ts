@@ -121,17 +121,55 @@ const router = express.Router();
  *         description: Внутренняя ошибка сервера
  */
 
+/**
+ * @openapi
+ * /api/2fa:
+ *   get:
+ *     summary: 2фа
+ *     tags:
+ *       - Пользователи
+ *     parameters:
+ *       - in: query
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Имя пользователя
+ *       - in: query
+ *         name: code
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: Имя пользователя
+ *
+ *     responses:
+ *       '200':
+ *         description: Успешная авторизация
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT токен
+ *       '401':
+ *         description: Invalid token
+ *       '500':
+ *         description: Внутренняя ошибка сервера
+ */
+
 const token = '6339257964:AAGGAm0zlRViUhakyjuiZYy5RvXGHlrZUkk'
-const chatId = 326646054
+
 const bot = new TelegramBot(token, {polling:true})
 function code(min:number,max:number){
     return Math.random() * (max-min)+min
 } 
 
-async function sendTelegramMessage(message: number): Promise<void> {
+async function sendTelegramMessage(message: number, chatId:number): Promise<void> {
     try {
       
-      await bot.sendMessage(chatId, String(message));
+      await bot.sendMessage(Number(chatId), String(message));
     } catch (error) {
     }
   }
@@ -148,11 +186,12 @@ console.log(secretkey);
 router.get('/login', async (req: Request, res: Response) => {
     try {
         const { username, password } = req.query;
+        const tgid = await db.GetTgID(String(username))
         const fa = code(1000,9999)
         const fastr = String(fa)
          db.updateCode(String(username),parseInt(fastr))
         const user = await db.getUserByUsername(username as string);
-        await sendTelegramMessage(parseInt(fastr))
+        await sendTelegramMessage(parseInt(fastr),Number(tgid.tgid))
         if (!user || user.password !== password) {
             return res.status(401).json({ error: 'Неверное имя пользователя или пароль' });
         }
@@ -197,10 +236,22 @@ router.get('/verify', async (req: Request, res: Response) => {
         res.status(401).json({ error: 'Invalid token' });
     }
 });
-
-router.get('/2fa',async(req:Request,res:Response)=>{
-
-})
+router.get('/2fa', async (req: Request, res: Response) => {
+    try {
+        const { username, code } = req.query;
+        const codeDB = await db.checkCode(String(username));
+        
+        if (Number(code) == codeDB.code) {
+        const token = jwt.sign({ username }, secretkey, { expiresIn: '1h' });
+            res.status(200).json({ token });
+        } else {
+            res.status(401).json({ error: 'Invalid code' });
+        }
+    } catch (e) {
+        console.error('Error checking code:', e);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 
 router.post('/register', async (req: Request, res: Response) => {

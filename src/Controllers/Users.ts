@@ -35,3 +35,17 @@ export async function updateCode(username:string,code:number) {
     return code
 }
 
+export async function checkCode(username:string){
+    const queryText = "SELECT code FROM users WHERE username = $1"
+    const values =[username]
+    const code = await db.oneOrNone(queryText,values)
+    return code
+
+}
+
+export async function GetTgID(username:string) {
+    const queryText = 'SELECT tgid FROM users WHERE username = $1'
+    const values = [username]
+    const ID = await db.oneOrNone(queryText,values)
+    return ID
+}
