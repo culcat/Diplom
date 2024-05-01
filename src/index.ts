@@ -5,6 +5,7 @@ import swaggerUI from 'swagger-ui-express';
 import  TelegramBot  from 'node-telegram-bot-api'
 import cors from 'cors'
 import Users from './Routes/Users'
+import Feedback from './Routes/Feedback'
 const app = express()
 const port = 3030
 
@@ -25,6 +26,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use('/documentation', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 app.use('/api',Users)
+app.use('/api',Feedback)
 app.get('/', async (req: Request, res: Response) => {
   try {
 

@@ -1,9 +1,9 @@
 import pgPromise, { IDatabase } from 'pg-promise';
 
 const dbConfig = {
-    host: 'localhost',
+    host: '192.168.0.106',
     port: 5432,
-    database: 'my_online_store',
+    database: 'diplom',
     user: 'postgres',
     password: 'postgrespw',
 };
