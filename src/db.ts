@@ -1,7 +1,7 @@
 import pgPromise, { IDatabase } from 'pg-promise';
 
 const dbConfig = {
-    host: '192.168.0.106',
+    host: '192.168.0.104',
     port: 5432,
     database: 'diplom',
     user: 'postgres',
