@@ -2,9 +2,9 @@ import {db} from "../db";
 
 
 
-export async function createUser(username: string, password: string) {
-    const queryText = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id';
-    const values = [username, password];
+export async function createUser(phone_number: string, password_hashed: string,email:string,firstname:string,lastname:string,thirdname:string,tgid:string,company:string) {
+    const queryText = 'INSERT INTO users (phone_number, password_hashed,email,firstname,lastname,thirdname,tgid,company) VALUES ($1, $2) RETURNING id';
+    const values = [phone_number, password_hashed,email,firstname,lastname,thirdname,tgid,company];
 
     try {
         const result = await db.one(queryText, values);
@@ -15,9 +15,9 @@ export async function createUser(username: string, password: string) {
     }
 }
 
-export async function getUserByUsername(username: string) {
-    const queryText = 'SELECT * FROM users WHERE username = $1';
-    const values = [username];
+export async function getUserByUsername(phone_number: string) {
+    const queryText = 'SELECT * FROM users WHERE phone_number = $1';
+    const values = [phone_number];
 
     try {
         const user = await db.oneOrNone(queryText, values);
@@ -28,24 +28,26 @@ export async function getUserByUsername(username: string) {
     }
 }
 
-export async function updateCode(username:string,code:number) {
-    const queryText = "UPDATE public.users SET code=$1 WHERE username=$2;"
-    const values = [code,username]
-    await db.oneOrNone(queryText,values)
-    return code
-}
 
-export async function checkCode(username:string){
-    const queryText = "SELECT code FROM users WHERE username = $1"
-    const values =[username]
-    const code = await db.oneOrNone(queryText,values)
-    return code
 
-}
+// export async function updateCode(username:string,code:number) {
+//     const queryText = "UPDATE public.users SET code=$1 WHERE username=$2;"
+//     const values = [code,username]
+//     await db.oneOrNone(queryText,values)
+//     return code
+// }
 
-export async function GetTgID(username:string) {
-    const queryText = 'SELECT tgid FROM users WHERE username = $1'
-    const values = [username]
-    const ID = await db.oneOrNone(queryText,values)
-    return ID
-}
+// export async function checkCode(username:string){
+//     const queryText = "SELECT code FROM users WHERE username = $1"
+//     const values =[username]
+//     const code = await db.oneOrNone(queryText,values)
+//     return code
+//
+// }
+
+// export async function GetTgID(username:string) {
+//     const queryText = 'SELECT tgid FROM users WHERE username = $1'
+//     const values = [username]
+//     const ID = await db.oneOrNone(queryText,values)
+//     return ID
+// }
