@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUI from 'swagger-ui-express';
 import  TelegramBot  from 'node-telegram-bot-api'
+import Tariff from './Routes/Tariff'
 import cors from 'cors'
 import Users from './Routes/Users'
 import Feedback from './Routes/Feedback'
@@ -27,6 +28,7 @@ app.use(bodyParser.json());
 app.use('/documentation', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 app.use('/api',Users)
 app.use('/api',Feedback)
+app.use('/api',Tariff)
 app.get('/', async (req: Request, res: Response) => {
   try {
 
