@@ -1,8 +1,8 @@
 import pgPromise, { IDatabase } from 'pg-promise';
 
 const dbConfig = {
-    host: '192.168.0.104',
-    port: 5432,
+    host: '5.tcp.eu.ngrok.io',
+    port: 17016,
     database: 'diplom',
     user: 'postgres',
     password: 'postgrespw',

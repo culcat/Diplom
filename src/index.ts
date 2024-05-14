@@ -7,6 +7,7 @@ import Tariff from './Routes/Tariff'
 import cors from 'cors'
 import Users from './Routes/Users'
 import Feedback from './Routes/Feedback'
+import Contact from "./Routes/Contact";
 const app = express()
 const port = 3030
 
@@ -29,6 +30,7 @@ app.use('/documentation', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 app.use('/api',Users)
 app.use('/api',Feedback)
 app.use('/api',Tariff)
+app.use('/api',Contact)
 app.get('/', async (req: Request, res: Response) => {
   try {
 

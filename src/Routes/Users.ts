@@ -191,7 +191,7 @@ const router = express.Router();
 
 const token = '6339257964:AAGGAm0zlRViUhakyjuiZYy5RvXGHlrZUkk'
 
-const bot = new TelegramBot(token, {polling:true})
+export const bot = new TelegramBot(token, {polling:true})
 function code(min:number,max:number){
     return Math.random() * (max-min)+min
 } 
