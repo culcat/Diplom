@@ -1,11 +1,11 @@
 import pgPromise, { IDatabase } from 'pg-promise';
 
 const dbConfig = {
-    host: '5.tcp.eu.ngrok.io',
-    port: 17955,
+    host: '147.45.247.226',
+    port: 5432,
     database: 'diplom',
-    user: 'postgres',
-    password: 'postgrespw',
+    user: 'gen_user',
+    password: '-I*\\$,bG\\6Z\\;=',
 };
 
 const pgp = pgPromise();
