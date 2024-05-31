@@ -3,7 +3,7 @@ import pgPromise, { IDatabase } from 'pg-promise';
 const dbConfig = {
     host: '147.45.247.226',
     port: 5432,
-    database: 'diplom',
+    database: 'default_db',
     user: 'gen_user',
     password: '-I*\\$,bG\\6Z\\;=',
 };
