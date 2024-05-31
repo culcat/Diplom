@@ -7,6 +7,8 @@ const router = express.Router()
  * /api/tariff:
  *   get:
  *     summary: Get all tariff
+ *     tags:
+ *       - Tariff
  *     responses:
  *       200:
  *         description: Returns all feedback

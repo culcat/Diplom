@@ -7,6 +7,8 @@ const router = express.Router()
  * /api/feedback:
  *   get:
  *     summary: Get all feedback
+ *     tags:
+ *       - Feedback
  *     responses:
  *       200:
  *         description: Returns all feedback
@@ -28,6 +30,8 @@ const router = express.Router()
  *                         type: string
  *   post:
  *     summary: Create a new feedback
+ *     tags:
+ *       - Feedback
  *     requestBody:
  *       required: true
  *       content:

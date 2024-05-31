@@ -44,15 +44,21 @@ const router = express.Router();
  */
 /**
  * @openapi
+ * tags:
+ *   - name: Пользователи
+ *     description: Управление пользователями системы
  * /api/register:
  *   post:
  *     summary: Регистрация нового пользователя
  *     description: Создает нового пользователя в системе
+ *     tags:
+ *       - Пользователи
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
+ *             type: object
  *             properties:
  *               phone_number:
  *                 type: string
@@ -85,7 +91,8 @@ const router = express.Router();
  *           application/json:
  *             schema:
  *               type: object
- *               properties:  userId:
+ *               properties:
+ *                 userId:
  *                   type: string
  *                   description: Идентификатор нового пользователя
  *                 phone_number:
