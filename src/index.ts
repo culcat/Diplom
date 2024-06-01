@@ -31,13 +31,14 @@ app.use('/api',Users)
 app.use('/api',Feedback)
 app.use('/api',Tariff)
 app.use('/api',Contact)
+app.use(express.static(__dirname + '/dist'))
 app.get('/', async (req: Request, res: Response) => {
   try {
 
-    res.send('Сообщение успешно отправлено в Telegram');
+    res.render('index.html');
   } catch (error) {
-    console.error('Ошибка отправки сообщения в Telegram:', error);
-    res.status(500).send('Ошибка отправки сообщения в Telegram');
+    console.error( error);
+    res.status(500).send(error);
   }
 });
 
