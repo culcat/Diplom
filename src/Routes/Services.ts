@@ -34,8 +34,8 @@ const router = express.Router()
 router.get('/services',
     async (req: express.Request, res: express.Response) => {
         try {
-            const tariff = await db.showServices();
-            res.status(200).json({ tariff });
+            const services = await db.showServices();
+            res.status(200).json({ services });
         } catch (err: any) {
             res.status(500).send({ error: err.message });
         }
