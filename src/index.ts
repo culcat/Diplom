@@ -8,6 +8,7 @@ import cors from 'cors'
 import Users from './Routes/Users'
 import Feedback from './Routes/Feedback'
 import Contact from "./Routes/Contact";
+import Services from "./Routes/Services";
 const app = express()
 const port = 3030
 
@@ -31,6 +32,7 @@ app.use('/api',Users)
 app.use('/api',Feedback)
 app.use('/api',Tariff)
 app.use('/api',Contact)
+app.use('/api',Services)
 app.use(express.static(__dirname + '/dist'))
 app.get('/', async (req: Request, res: Response) => {
   try {
