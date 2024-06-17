@@ -9,6 +9,7 @@ import Users from './Routes/Users'
 import Feedback from './Routes/Feedback'
 import Contact from "./Routes/Contact";
 import Services from "./Routes/Services";
+import Trucks from "./Routes/Trucks";
 const app = express()
 const port = 3030
 
@@ -33,6 +34,7 @@ app.use('/api',Feedback)
 app.use('/api',Tariff)
 app.use('/api',Contact)
 app.use('/api',Services)
+app.use('/api',Trucks)
 app.use(express.static(__dirname + '/dist'))
 app.get('/', async (req: Request, res: Response) => {
   try {
