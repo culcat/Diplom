@@ -25,3 +25,42 @@ export async function getCustomer(id:Number) {
         throw e;
     }
 }
+
+export async function getType(id:Number){
+    const queryText = 'SELECT * FROM public."Type" where id = $1';
+    const values = [id];
+    try{
+        const result = await db.oneOrNone(queryText,values)
+        console.log(result)
+        return result
+    }catch(e){
+        console.error('Error creating user:', e);
+        throw e;
+    }
+}
+
+export async function getTruck(id:Number){
+    const queryText = 'SELECT "Brand" FROM public.trucks where id = $1';
+    const values = [id];
+    try{
+        const result = await db.oneOrNone(queryText,values)
+        console.log(result)
+        return result
+    }catch(e){
+        console.error('Error creating user:', e);
+        throw e;
+    }
+}
+
+export async function getBrand(id:Number){
+    const queryText = 'SELECT * FROM public."Brand" where id = $1';
+    const values = [id];
+    try{
+        const result = await db.oneOrNone(queryText,values)
+        console.log(result)
+        return result
+    }catch(e){
+        console.error('Error creating user:', e);
+        throw e;
+    }
+}
