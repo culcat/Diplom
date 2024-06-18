@@ -18,20 +18,18 @@ const router = express.Router();
  *         - type_id
  *         - from
  *         - where
- *         - distance
  *         - weight
- *         - endprice
  *         - status
  *         - created_at
  *       properties:
  *         truk_id:
  *           type: integer
  *           description: ID of the truck
- *           example: 1
+ *           example: 4
  *         user_id:
  *           type: integer
  *           description: ID of the user
- *           example: 2
+ *           example: 1
  *         type_id:
  *           type: integer
  *           description: ID of the type
@@ -39,23 +37,15 @@ const router = express.Router();
  *         from:
  *           type: string
  *           description: Starting location
- *           example: "New York"
+ *           example: "Ростов-на-Дону"
  *         where:
  *           type: string
  *           description: Destination location
- *           example: "Los Angeles"
- *         distance:
- *           type: number
- *           description: Distance between locations
- *           example: 4500.5
+ *           example: "Москва"
  *         weight:
  *           type: number
  *           description: Weight of the order
  *           example: 1500
- *         endprice:
- *           type: number
- *           description: Final price of the order
- *           example: 2000.50
  *         status:
  *           type: boolean
  *           description: Status of the order
@@ -158,7 +148,7 @@ const router = express.Router();
  */
 router.post('/order', async (req: Request, res: Response) => {
     try {
-        const { truk_id, user_id, type_id, from, where, weight, endprice, status, created_at } = req.body;
+        const { truk_id, user_id, type_id, from, where, weight, status, created_at } = req.body;
 
         const getAdmins = await getAdmin();
         const getUserInfo = await getCustomer(Number(user_id));
@@ -169,6 +159,7 @@ router.post('/order', async (req: Request, res: Response) => {
         const whereCoords = await GeoDecode(where);
         const distanceCalc = await CalculateDistance(fromCoords[0],fromCoords[1], whereCoords[0],whereCoords[1]);
         const customer = getUserInfo[0];
+        const endprice = Math.round(distanceCalc * 10);
         const message = `
             Новый заказ:
             Заказчик: ${customer.firstname} ${customer.lastname}
