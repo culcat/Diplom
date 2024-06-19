@@ -1,8 +1,7 @@
 export default async function GeoDecode(address: string) {
     const url: string = "https://cleaner.dadata.ru/api/v1/clean/address";
-    const token: string = "af76299f7dae225c05644106e2d432906ecf7ebe";
-    const secret: string = "e013939c8df37e83df4be8cccbbcfe4932a31b83";
-    const query: string = address;
+    const token = "ef9ba03f20f9246fc647322efa5ec79bef3f99d4";
+    const secret = "42c8102872054c6cb00e4a8aadd14fe547c15371";
 
     const options: RequestInit = {
         method: "POST",
@@ -12,7 +11,7 @@ export default async function GeoDecode(address: string) {
             "Authorization": "Token " + token,
             "X-Secret": secret
         },
-        body: JSON.stringify([query])
+        body: JSON.stringify([address])
     };
     const response = await fetch(url, options);
     const result = await response.json();
@@ -22,3 +21,4 @@ export default async function GeoDecode(address: string) {
     const geo = [Number(geoLat), Number(geoLon)];
     return geo;
 }
+

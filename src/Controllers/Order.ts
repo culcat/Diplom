@@ -26,3 +26,8 @@ export  const getOrder = async (userid:Number): Promise<Order[]> => {
     const result = await db.manyOrNone('SELECT * FROM "order" WHERE user_id = $1', [userid]);
     return result;
 }
+
+export const changeStatus = async (id: number): Promise<void> => {
+    const result = await db.one('UPDATE "order" SET status = true WHERE id = $1', [id]);
+    return result;
+}

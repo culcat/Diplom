@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import {createOrder, getOrder} from '../Controllers/Order';
+import {changeStatus, createOrder, getOrder} from '../Controllers/Order';
 import {bot} from './Users';
 import {getAdmin, getBrand, getCustomer, getTruck, getType} from "../Controllers/Contact";
 import GeoDecode from "../Utils/GeoDecode";
@@ -146,12 +146,70 @@ const router = express.Router();
  *                   description: Error message.
  *                   example: "Internal Server Error"
  */
+/**
+ * @swagger
+ * /api/order:
+ *   put:
+ *     summary: Update order status
+ *     description: Update the status of an order by its order ID.
+ *     tags:
+ *       - Orders
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *         description: ID of the order whose status is to be updated.
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     requestBody:
+ *       description: New status of the order
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: boolean
+ *                 description: New status of the order
+ *                 example: true
+ *     responses:
+ *       200:
+ *         description: Order status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 order_id:
+ *                   type: integer
+ *                   description: The order ID.
+ *                   example: 1
+ *                 status:
+ *                   type: boolean
+ *                   description: The updated status of the order.
+ *                   example: true
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ *                   example: "Internal Server Error"
+ */
+
 router.post('/order', async (req: Request, res: Response) => {
     try {
         const { truk_id, user_id, type_id, from, where, weight, status, created_at } = req.body;
 
         const getAdmins = await getAdmin();
         const getUserInfo = await getCustomer(Number(user_id));
+        console.log(getAdmins[0].tgid)
         const getTypeOrder = await getType(Number(type_id));
         const getTruckInfo = await getTruck(Number(truk_id));
         const getBrandInfo = await getBrand(getTruckInfo.Brand)
@@ -178,7 +236,6 @@ router.post('/order', async (req: Request, res: Response) => {
         for (let i = 0; i < getAdmins.length; i++) {
             bot.sendMessage(getAdmins[i].tgid, message);
         }
-
         const newOrder = await createOrder({
             truk_id,
             user_id,
@@ -195,6 +252,7 @@ router.post('/order', async (req: Request, res: Response) => {
         res.status(201).json(newOrder);
     } catch (error) {
         res.status(500).json({ error: error });
+        console.error(error);
     }
 });
 
@@ -203,6 +261,16 @@ router.get('/order', async (req: Request, res: Response) => {
     const {user_id} = req.query;
     try {
         const orders = await getOrder(Number(user_id));
+        res.status(200).json(orders);
+    } catch (error) {
+        res.status(500).json({ error: error });
+    }
+})
+
+router.put('/order', async (req: Request, res: Response) => {
+    const {id} = req.query;
+    try {
+        const orders = await changeStatus(Number(id));
         res.status(200).json(orders);
     } catch (error) {
         res.status(500).json({ error: error });

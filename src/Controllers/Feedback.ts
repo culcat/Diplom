@@ -41,3 +41,14 @@ export async function createFeedback(user_id:number,message:string) {
     }
 
 }
+export async function deleteFeedback(id:number) {
+    const queryText = 'DELETE FROM feedback WHERE id = $1';
+    const values = [id];
+    try{
+        const result = await db.none(queryText, values)
+        return result
+    }catch(e){
+        console.error('Error creating user:', e);
+        throw e;
+    }
+}
