@@ -154,7 +154,7 @@ const router = express.Router();
  *       '500':
  *         description: Внутренняя ошибка сервера
  */
-const token = "YOUR_TELEGRAM_BOT_TOKEN";
+const token = "6339257964:AAGGAm0zlRViUhakyjuiZYy5RvXGHlrZUkk";
 
 export const bot = new TelegramBot(token, { polling: true });
 function code(min: number, max: number) {
