@@ -11,7 +11,7 @@ export async function createUser(
     company: string,
 ) {
     const queryText =
-        'INSERT INTO public."Users" (phone_number, password_hashed,email,firstname,lastname,thirdname,tgid,company) VALUES ($1, $2) RETURNING id';
+        'INSERT INTO public."Users" (phone_number, password_hashed,email,firstname,lastname,thirdname,company) VALUES ($1, $2,$3, $4, $5, $6,$7) RETURNING id';
     const values = [
         phone_number,
         password_hashed,
@@ -19,7 +19,6 @@ export async function createUser(
         firstname,
         lastname,
         thirdname,
-        tgid,
         company,
     ];
 

@@ -1,12 +1,13 @@
 import express, { Request, Response } from "express";
 import * as db from "../Controllers/Users";
 import * as crypto from "crypto";
-import jwt, { TokenExpiredError, verify } from "jsonwebtoken";
+import jwt, { TokenExpiredError } from "jsonwebtoken";
 import TelegramBot from "node-telegram-bot-api";
+import bcrypt from "bcrypt";
 
 const router = express.Router();
+
 /**
- /**
  * @openapi
  * /api/login:
  *   get:
@@ -19,9 +20,9 @@ const router = express.Router();
  *         required: true
  *         schema:
  *           type: string
- *         description: Имя пользователя
+ *         description: Номер телефона
  *       - in: query
- *         name: password_hashed
+ *         name: password
  *         required: true
  *         schema:
  *           type: string
@@ -63,9 +64,9 @@ const router = express.Router();
  *               phone_number:
  *                 type: string
  *                 description: Номер телефона пользователя
- *               password_hashed:
+ *               password:
  *                 type: string
- *                 description: Захешированный пароль пользователя
+ *                 description: Пароль пользователя
  *               email:
  *                 type: string
  *                 description: Email пользователя
@@ -98,9 +99,6 @@ const router = express.Router();
  *                 phone_number:
  *                   type: string
  *                   description: Номер телефона нового пользователя
- *                 password_hashed:
- *                   type: string
- *                   description: Захешированный пароль нового пользователя
  *                 token:
  *                   type: string
  *                   description: JWT токен для нового пользователя
@@ -125,7 +123,6 @@ const router = express.Router();
  *                   type: string
  *                   description: Описание ошибки
  */
-
 /**
  * @openapi
  * /api/verify:
@@ -157,59 +154,19 @@ const router = express.Router();
  *       '500':
  *         description: Внутренняя ошибка сервера
  */
-
-/**
- * @openapi
- * /api/2fa:
- *   get:
- *     summary: 2фа
- *     tags:
- *       - Пользователи
- *     parameters:
- *       - in: query
- *         name: username
- *         required: true
- *         schema:
- *           type: string
- *         description: Имя пользователя
- *       - in: query
- *         name: code
- *         required: true
- *         schema:
- *           type: number
- *         description: Имя пользователя
- *
- *     responses:
- *       '200':
- *         description: Успешная авторизация
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                   description: JWT токен
- *       '401':
- *         description: Invalid token
- *       '500':
- *         description: Внутренняя ошибка сервера
- */
-
-const token = "6339257964:AAGGAm0zlRViUhakyjuiZYy5RvXGHlrZUkk";
+const token = "YOUR_TELEGRAM_BOT_TOKEN";
 
 export const bot = new TelegramBot(token, { polling: true });
 function code(min: number, max: number) {
-    return Math.random() * (max - min) + min;
+    return Math.floor(Math.random() * (max - min) + min);
 }
 
-async function sendTelegramMessage(
-    message: number,
-    chatId: number,
-): Promise<void> {
+async function sendTelegramMessage(message: number, chatId: number): Promise<void> {
     try {
         await bot.sendMessage(Number(chatId), String(message));
-    } catch (error) {}
+    } catch (error) {
+        console.error("Error sending message:", error);
+    }
 }
 
 function generateSecretKey(): string {
@@ -222,16 +179,15 @@ console.log(secretkey);
 router.get("/login", async (req: Request, res: Response) => {
     try {
         const { phone_number, password } = req.query;
-        // const tgid = await db.GetTgID(String(username))
-        const fa = code(1000, 9999);
-        const fastr = String(fa);
-        // db.updateCode(String(username),parseInt(fastr))
         const user = await db.getUserByUsername(phone_number as string);
-        // await sendTelegramMessage(parseInt(fastr),Number(tgid.tgid))
-        if (!user || user.password_hashed == password) {
-            return res
-                .status(401)
-                .json({ error: "Неверное имя пользователя или пароль" });
+
+        if (!user) {
+            return res.status(401).json({ error: "Неверное имя пользователя или пароль" });
+        }
+
+        const passwordMatch = await bcrypt.compare(password as string, user.password_hashed);
+        if (!passwordMatch) {
+            return res.status(401).json({ error: "Неверное имя пользователя или пароль" });
         }
 
         const token = jwt.sign({ phone_number }, secretkey, {
@@ -254,10 +210,7 @@ router.get("/verify", async (req: Request, res: Response) => {
             return res.status(401).json({ error: "Token is required" });
         }
 
-        const decoded = jwt.verify(
-            token as string,
-            secretkey,
-        ) as jwt.JwtPayload;
+        const decoded = jwt.verify(token as string, secretkey) as jwt.JwtPayload;
         console.log("Decoded Payload:", decoded);
 
         if (!decoded.phone_number) {
@@ -266,7 +219,6 @@ router.get("/verify", async (req: Request, res: Response) => {
 
         const user = await db.getUserByUsername(decoded.phone_number);
 
-        // Return user information in the response
         res.status(200).json({ user });
     } catch (error) {
         if (error instanceof TokenExpiredError) {
@@ -277,65 +229,31 @@ router.get("/verify", async (req: Request, res: Response) => {
         res.status(401).json({ error: "Invalid token" });
     }
 });
-// router.get('/2fa', async (req: Request, res: Response) => {
-//     try {
-//         const { username, code } = req.query;
-//         const codeDB = await db.checkCode(String(username));
-//
-//         if (Number(code) == codeDB.code) {
-//         const token = jwt.sign({ username }, secretkey, { expiresIn: '1h' });
-//             res.status(200).json({ token });
-//         } else {
-//             res.status(401).json({ error: 'Invalid code' });
-//         }
-//     } catch (e) {
-//         console.error('Error checking code:', e);
-//         res.status(500).json({ error: 'Internal Server Error' });
-//     }
-// });
 
 router.post("/register", async (req: Request, res: Response) => {
     try {
-        const {
-            phone_number,
-            password_hashed,
-            email,
-            firstname,
-            lastname,
-            thirdname,
-            tgid,
-            company,
-        } = req.body;
+        const { phone_number, password, email, firstname, lastname, thirdname, tgid, company } = req.body;
 
-        if (!phone_number || !password_hashed) {
+        if (!phone_number || !password) {
             return res.status(400).json({ error: "Missing required fields" });
         }
 
         const existingUser = await db.getUserByUsername(phone_number);
 
         if (existingUser) {
-            return res
-                .status(400)
-                .json({ error: "User with this username already exists" });
+            return res.status(400).json({ error: "User with this phone number already exists" });
         }
 
-        const userId = await db.createUser(
-            phone_number,
-            password_hashed,
-            email,
-            firstname,
-            lastname,
-            thirdname,
-            tgid,
-            company,
-        );
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Generate a token for the newly registered user
+        const userId = await db.createUser(phone_number, hashedPassword, email, firstname, lastname, thirdname, tgid, company);
+
         const token = jwt.sign({ phone_number }, secretkey, {
             expiresIn: "1h",
         });
 
-        res.status(201).json({ userId, phone_number, password_hashed, token });
+        res.status(201).json({ userId, phone_number, token });
     } catch (error) {
         console.error("Error creating user:", error);
         res.status(500).json({ error: "Internal Server Error" });
